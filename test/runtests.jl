@@ -2,6 +2,7 @@ using VCFTools
 using TranscodingStreams
 using Test
 using VariantCallFormat
+import VariantCallFormat.findgenokey
 using CodecZlib
 using DelimitedFiles
 

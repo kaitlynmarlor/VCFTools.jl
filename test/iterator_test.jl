@@ -66,26 +66,88 @@ end
 # put genetic variant base tests here 
 """
 
-# Create a temporary VCF file for testing
-isfile("test.08Jun17.d8b.vcf.gz") || Downloads.download("http://faculty.washington.edu/browning/beagle/test.08Jun17.d8b.vcf.gz",
-joinpath(dirname(pathof(VCFTools)), "..", "test/test.08Jun17.d8b.vcf.gz"))
+ # Create a temporary VCF file for testing
+ isfile("test.08Jun17.d8b.vcf.gz") || Downloads.download("http://faculty.washington.edu/browning/beagle/test.08Jun17.d8b.vcf.gz",
+ joinpath(dirname(pathof(VCFTools)), "..", "test/test.08Jun17.d8b.vcf.gz"))
 
-vcf_file = joinpath(dirname(pathof(VCFTools)), "..", "test/test.08Jun17.d8b.vcf.gz")
-vcf_iterator = VCFIterator(vcf_file)
+ vcf_file = joinpath(dirname(pathof(VCFTools)), "..", "test/test.08Jun17.d8b.vcf.gz")
 
-for i in 1:50
-    vcf_row, _ = iterate(vcf_iterator, i)
+#  vcf_iter = VCFIterator(vcf_file)
+#  vcf, state = iterate(vcf_iter,1299)
+#  print(vcf)
 
-    # Print the genotype information for the current record
-    println("Genotypes for record $i: ", vcf_row.GENOTYPE)
-end
+ # at record 292 id is missing 
+ # at record 429 qual is missing 
+ # at record 1299 id is missing
 
-row = VCFRow("1", 9001061, [], "T", ["G"], 32.0, [1.0, 1.0])
+#  @testset "VCF file tests" begin
+#     # Initialize a counter to keep track of passed tests
+    
+#     # Create an iterator for your VCF file
+#     vcf_iter = VCFIterator(vcf_file)
 
+#     vcf, state = iterate(vcf_iter,1356)
+#     print(vcf)
+    
+    # # Iterate over the length of the VCF file
+    # for i in 1:nrecords(vcf_file)
+    #     # Obtain the VCFRow object at the current iteration
+    #     vcf_row, _ = iterate(vcf_iter, i)
+            
+    #     # Test chrom function
+    #     @test chrom(VCFData(vcf_file), vcf_row) == vcf_row.CHROM
+    #     # Test pos function
+    #     @test pos(VCFData(vcf_file), vcf_row) == vcf_row.POS
+    #     # Test rsid function
+    #     @test rsid(VCFData(vcf_file), vcf_row) == vcf_row.ID
+    #     # Test alleles function
+    #     @test alleles(VCFData(vcf_file), vcf_row) == (vcf_row.REF, vcf_row.ALT)
+    #     # Test alt_allele function
+    #     @test alt_allele(VCFData(vcf_file), vcf_row) == vcf_row.ALT
+    #     # Test ref_allele function
+    #     @test ref_allele(VCFData(vcf_file), vcf_row) == vcf_row.REF
+    # end
 
+# end
 
-"""
-vcf_row = VCFRow("22", 20000086, ["rs138720731"], "T", ["C"], 100.0, Union{Missing, Float64}[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-data = VCFData(vcf_file, vcf)
-@test maf(data, vcf_row) == 0.0
-"""
+# @testset "MAF Tests" begin
+#     vcf_iter = VCFIterator(vcf_file)
+#     num = nrecords(vcf_file)
+#     vcf_data = VCFData(vcf_file)
+#     records, samples, lines, missing_by_sample, missings_by_record, maf_by_record, minor_allele_by_record, hwe_by_record = gtstats(vcf_file)
+
+#     for i in 1:nrecords(vcf_file)
+#         # Obtain the VCFRow object at the current iteration
+#         vcf_row, _ = iterate(vcf_iter, i)
+#         @test maf(vcf_data,vcf_row) == maf_by_record[i]
+#     end
+# end
+
+# @testset "HWE Tests" begin
+#     vcf_iter = VCFIterator(vcf_file)
+#     num = nrecords(vcf_file)
+#     vcf_data = VCFData(vcf_file)
+#     records, samples, lines, missing_by_sample, missings_by_record, maf_by_record, minor_allele_by_record, hwe_by_record = gtstats(vcf_file)
+
+#     for i in 1:nrecords(vcf_file)
+#         # Obtain the VCFRow object at the current iteration
+#         vcf_row, _ = iterate(vcf_iter, i)
+#         @test hwepval(vcf_data,vcf_row) == hwe_by_record[i]
+#     end
+# end
+
+# vcf_iter = VCFIterator(vcf_file)
+# vcf, state = iterate(vcf_iter,1355)
+# print(vcf)
+
+# @testset "Alternate Dosages" begin
+#     vcf_iter = VCFIterator(vcf_file)
+#     vcf_data = VCFData(vcf_file)
+
+#     for i in 1:nrecords(vcf_file)
+#         vcf_row, _ = iterate(vcf_iter, i)
+#         ds = vcf_row.DOSAGES
+#         gt = vcf_row.GENOTYPE
+#     end
+# end
+
