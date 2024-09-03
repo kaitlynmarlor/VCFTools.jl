@@ -8,7 +8,7 @@ mutable struct VCFIterator <: VariantIterator
     sample_num::Int
 end
 
-function VCFIterator(vcffile::AbstractString; sample_num::Int=nsamples(VCF.Reader(openvcf(vcffile, "r"))))
+function VCFIterator(vcffile::AbstractString; sample_num::Int=VCFTools.nsamples(VCF.Reader(openvcf(vcffile, "r"))))
     vcf = VCF.Reader(openvcf(vcffile, "r")) 
     return VCFIterator(vcffile, vcf, sample_num) #then returns an iostream 
 end
@@ -108,7 +108,7 @@ end
 
 function ds_key(record::VCF.Record; key::String = "DS", impute::Bool = false, center::Bool = false, scale::Bool = false)
     A = Vector{Union{Missing, Float64}}(undef, length(record.genotype))  
-    dskey = findgenokey(record, key)
+    dskey = VariantCallFormat.findgenokey(record, key)
 
     for i in 1:length(record.genotype)
         if dskey === nothing
@@ -154,7 +154,7 @@ end
 
 function gt_key(record::VCF.Record; model::Symbol = :additive, impute::Bool = false, center::Bool = false, scale::Bool = false)
     A = Vector{Union{Missing, Float64}}(undef, length(record.genotype)) 
-    gtkey = findgenokey(record, "GT")
+    gtkey = VariantCallFormat.findgenokey(record, "GT")
 
     _, _, _, _, _, alt_freq, _, _, _, _, _ = gtstats(record, nothing)
     ct = 2alt_freq
