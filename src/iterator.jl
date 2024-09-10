@@ -14,7 +14,7 @@ mutable struct VCFData <: GeneticData # feed VCFData VCFIterator function output
 end
 # placeholder because other genotype files need that 
 
-mutable struct VCFRow <: Variant
+mutable struct VCFRow <: GeneticVariantBase.Variant
     CHROM::String
     POS::Int64
     ID::Vector{String}
