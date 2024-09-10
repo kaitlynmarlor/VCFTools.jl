@@ -1,7 +1,3 @@
-abstract type VariantIterator end
-abstract type Variant end
-abstract type GeneticData end
-
 mutable struct VCFIterator <: VariantIterator
     vcffile::AbstractString
     vcf::VCF.Reader
