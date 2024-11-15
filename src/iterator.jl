@@ -1,3 +1,6 @@
+abstract type VariantIterator end
+abstract type GeneticData end 
+
 mutable struct VCFIterator <: VariantIterator
     vcffile::AbstractString
     vcf::VCF.Reader
@@ -59,8 +62,8 @@ function Base.iterate(itr::VCFIterator, state=1)
                 pos = VCF.pos(record) 
                 ref = VCF.ref(record)
                 alt = VCF.alt(record)
-                geno = gt_key(record)
-                ds = ds_key(record)
+                geno = gt_key(record, impute=true)
+                ds = ds_key(record, impute=true)
 
                 # Handle ID and QUAL using try...catch
                 try
@@ -137,7 +140,7 @@ function ds_key(record::VCF.Record; key::String = "DS", impute::Bool = false, ce
         end
 
         if impute
-            for i in eachindex(A, 1)
+            for i in eachindex(A)
                 if A[i] === missing
                     A[i] = ct
                 end
@@ -180,34 +183,34 @@ function gt_key(record::VCF.Record; model::Symbol = :additive, impute::Bool = fa
     return A
 end
 
-function chrom(data::VCFData, row::VCFRow)::String
+function GeneticVariantBase.chrom(data::VCFData, row::VCFRow)::String
     return row.CHROM
 end
 
-function pos(data::VCFData, row::VCFRow)::Int
+function GeneticVariantBase.pos(data::VCFData, row::VCFRow)::Int
     return row.POS
 end
 
-function rsid(data::VCFData, row::VCFRow)::Vector{String}
+function GeneticVariantBase.rsid(data::VCFData, row::VCFRow)::Vector{String}
     return row.ID
 end
 
-function alleles(data::VCFData, row::VCFRow)::Tuple{String, Vector{String}}
+function GeneticVariantBase.alleles(data::VCFData, row::VCFRow)::Tuple{String, Vector{String}}
     return (row.REF, row.ALT)
 end
 
-function alt_allele(data::VCFData, row::VCFRow)::Vector{String}
+function GeneticVariantBase.alt_allele(data::VCFData, row::VCFRow)::Vector{String}
     return row.ALT
 end
 
-function ref_allele(data::VCFData, row::VCFRow)::String
+function GeneticVariantBase.ref_allele(data::VCFData, row::VCFRow)::String
     return row.REF
 end
 
 # use GeneticData as argument for genetic variant base functions 
 # GeneticData, VCFRow
 
-function maf(data::VCFData, row::VCFRow)
+function GeneticVariantBase.maf(data::VCFData, row::VCFRow)
 
     records, samples, lines, missing_by_sample, missings_by_record, maf_by_record, minor_allele_by_record, hwe_by_record = gtstats(data.file_name)
     maf = maf_by_record[row.INDEX]
@@ -220,7 +223,7 @@ end
 #reads in genotypes 0 1 2 average divided by two allele frequency of alternate allele 
 #dosages for each snp 0-2
 
-function hwepval(data::VCFData, row::VCFRow)
+function GeneticVariantBase.hwepval(data::VCFData, row::VCFRow)
     
     records, samples, lines, missing_by_sample, missings_by_record, maf_by_record, minor_allele_by_record, hwe_by_record = gtstats(data.file_name)
     p_value = hwe_by_record[row.INDEX]
@@ -228,13 +231,25 @@ function hwepval(data::VCFData, row::VCFRow)
 
 end
 
-function alt_dosages!(arr::AbstractArray{T}, row::VCFRow; use_genotype::Bool = false) where T <: Real
+
+
+#copy_gt has keyword argument impute in VCFTools.jl 
+# we need to run it with that option 
+# impute, scale, center keyword arguments for this function 
+# impute will impute the missing values 
+# scale will divide by standard dev 
+# center will subtract mean
+# can do similar thing for other file formats 
+
+function GeneticVariantBase.alt_dosages!(arr::AbstractArray{T}, row::VCFRow; use_genotype::Bool = false) where T <: Real
+
+
     if use_genotype
         genotypes = row.GENOTYPE
         @assert length(arr) == length(genotypes) "Array size does not match genotype size"
-        for i in 1:genotypes
+        for i in 1:length(genotypes)
             if genotypes[i] === missing 
-                arr[i] = NaN
+                arr[i] = convert_gt(T, (a1, a2), model)
             else
                 arr[i] = genotypes[i] 
             end
@@ -243,9 +258,9 @@ function alt_dosages!(arr::AbstractArray{T}, row::VCFRow; use_genotype::Bool = f
     else
         dosages = row.DOSAGES
         @assert length(arr) == length(dosages) "Array size does not match dosages size"
-        for i in 1:dosages
+        for i in 1:length(dosages)
             if dosages[i] === missing
-                arr[i] = NaN
+                arr[i] = convert_gt(T, (a1, a2), model)
             else
                 arr[i] = dosages[i] 
             end
@@ -256,10 +271,10 @@ end
 
 
 
-function alt_genotypes!(arr::AbstractArray{T}, row::VCFRow) where T <: Real
+function GeneticVariantBase.alt_genotypes!(arr::AbstractArray{T}, row::VCFRow) where T <: Real
     genotypes = row.GENOTYPE
     @assert length(arr) == length(genotypes) "Array size does not match genotype size"
-    for i in 1:genotypes
+    for i in 1:length(genotypes)
         if genotypes[i] === missing 
             arr[i] = NaN
         else

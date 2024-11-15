@@ -5,6 +5,7 @@ using VariantCallFormat
 import VariantCallFormat.findgenokey
 using CodecZlib
 using DelimitedFiles
+using GeneticVariantBase
 
 # packages needed only for testing
 using Random
