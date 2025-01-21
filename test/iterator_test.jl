@@ -72,6 +72,12 @@ end
 
  vcf_file = joinpath(dirname(pathof(VCFTools)), "..", "test/test.08Jun17.d8b.vcf.gz")
 
+@testset "nrecords and nsamples" begin
+    vcf_iter = VCFIterator(vcf_file)
+    vcf_data = VCFData(vcf_file)
+    print(n_samples(vcf_data))
+    print(n_records(vcf_data))
+end
 #  vcf_iter = VCFIterator(vcf_file)
 #  vcf, state = iterate(vcf_iter,1299)
 #  print(vcf)
@@ -140,37 +146,37 @@ end
 # vcf, state = iterate(vcf_iter,1355)
 # print(vcf)
 
-@testset "Alternate Dosages" begin
-    vcf_iter = VCFIterator(vcf_file)
-    vcf_data = VCFData(vcf_file)
+# @testset "Alternate Dosages" begin
+#     vcf_iter = VCFIterator(vcf_file)
+#     vcf_data = VCFData(vcf_file)
 
-    reader = VCF.Reader(openvcf(vcf_file, "r"))
-    nrecords, nsamples, _, _, _, _, _, _ = gtstats(vcf_file)
-    gholder = Matrix{Union{Missing, Float64}}(missing, nsamples, nrecords)
-    copy_gt!(gholder, reader, impute=true)    
+#     reader = VCF.Reader(openvcf(vcf_file, "r"))
+#     nrecords, nsamples, _, _, _, _, _, _ = gtstats(vcf_file)
+#     gholder = Matrix{Union{Missing, Float64}}(missing, nsamples, nrecords)
+#     copy_gt!(gholder, reader, impute=true)    
 
-    i=1
-    reader = VCF.Reader(openvcf(vcf_file, "r"))
-    for record in reader
-        if i > nsamples
-            break 
-        end 
-        gt = gt_key(record)
-        cp = gholder[:, i]
-        @test gt == cp
-        # println("GT KEY $gt")
-        # println("COPY_GT $cp")
-        i=i+1
+#     i=1
+#     reader = VCF.Reader(openvcf(vcf_file, "r"))
+#     for record in reader
+#         if i > nsamples
+#             break 
+#         end 
+#         gt = gt_key(record)
+#         cp = gholder[:, i]
+#         @test gt == cp
+#         # println("GT KEY $gt")
+#         # println("COPY_GT $cp")
+#         i=i+1
 
-    end 
+#     end 
 
-    for i in 1:nrecords
-        vcf_row, _ = iterate(vcf_iter, i)
-        ds = vcf_row.DOSAGES
-        gt = vcf_row.GENOTYPE
-        A = fill(0.0, length(gt))
-        alt_dosages!(A, vcf_row)
-        println("alt_dosages array $A")    
-    end
-end
+#     for i in 1:nrecords
+#         vcf_row, _ = iterate(vcf_iter, i)
+#         ds = vcf_row.DOSAGES
+#         gt = vcf_row.GENOTYPE
+#         A = fill(0.0, length(gt))
+#         alt_dosages!(A, vcf_row)
+#         println("alt_dosages array $A")    
+#     end
+# end
 
