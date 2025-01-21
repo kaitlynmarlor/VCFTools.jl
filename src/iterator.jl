@@ -276,7 +276,7 @@ function GeneticVariantBase.alt_genotypes!(arr::AbstractArray{T}, row::VCFRow) w
     @assert length(arr) == length(genotypes) "Array size does not match genotype size"
     for i in 1:length(genotypes)
         if genotypes[i] === missing 
-            arr[i] = NaN
+            arr[i] = convert_gt(T, (a1, a2), model)
         else
             arr[i] = genotypes[i] 
         end
