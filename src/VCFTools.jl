@@ -13,7 +13,7 @@ import VariantCallFormat.findgenokey
 
 export conformgt_by_id, conformgt_by_pos,
     gtstats, geno_ismissing,
-    nrecords, nsamples, openvcf,
+    nrecords, nsamples, openvcf, VCFData
     n_samples, n_variants,
     sampleID,
     grm,
