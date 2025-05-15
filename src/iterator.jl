@@ -65,7 +65,6 @@ function Base.iterate(itr::VCFIterator, state=1)
                 geno = gt_key(record, impute=true)
                 ds = ds_key(record, impute=true)
 
-                # Handle ID and QUAL using try...catch
                 try
                     ids = VCF.id(record)
                 catch e
@@ -235,7 +234,7 @@ function GeneticVariantBase.n_samples(data::VCFData)
     return nsamples(data.file_name)
 end 
 
-function GeneticVariantBase.n_records(data::VCFData)
+function GeneticVariantBase.n_variants(data::VCFData)
     return nrecords(data.file_name)
 end 
 

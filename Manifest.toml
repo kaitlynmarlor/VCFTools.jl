@@ -154,9 +154,10 @@ deps = ["Random"]
 uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
 
 [[deps.GeneticVariantBase]]
-git-tree-sha1 = "38d8f5e84ea20f62b549003808f52692a124676a"
+deps = ["StatsBase"]
+path = "/Users/kaitlyn/.julia/dev/GeneticVariantBase"
 uuid = "2447270c-d849-4bf9-ac0d-b5c0b265991c"
-version = "0.1.1"
+version = "0.1.2"
 
 [[deps.HypergeometricFunctions]]
 deps = ["DualNumbers", "LinearAlgebra", "OpenLibm_jll", "SpecialFunctions"]

@@ -14,6 +14,7 @@ import VariantCallFormat.findgenokey
 export conformgt_by_id, conformgt_by_pos,
     gtstats, geno_ismissing,
     nrecords, nsamples, openvcf,
+    n_samples, n_variants,
     sampleID,
     grm,
     # convert functions

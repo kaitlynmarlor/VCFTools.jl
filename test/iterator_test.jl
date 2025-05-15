@@ -73,7 +73,6 @@ end
  vcf_file = joinpath(dirname(pathof(VCFTools)), "..", "test/test.08Jun17.d8b.vcf.gz")
 
 @testset "nrecords and nsamples" begin
-    vcf_iter = VCFIterator(vcf_file)
     vcf_data = VCFData(vcf_file)
     print(n_samples(vcf_data))
     print(n_records(vcf_data))
