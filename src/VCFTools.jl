@@ -9,12 +9,12 @@ using Dates
 using SpecialFunctions
 using VariantCallFormat
 using GeneticVariantBase
+using GeneticVariantBase: n_samples, n_variants
 import VariantCallFormat.findgenokey
 
 export conformgt_by_id, conformgt_by_pos,
     gtstats, geno_ismissing,
-    nrecords, nsamples, openvcf, VCFData
-    n_samples, n_variants,
+    nrecords, nsamples, openvcf, VCFData,
     sampleID,
     grm,
     # convert functions
