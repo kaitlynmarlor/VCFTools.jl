@@ -72,11 +72,12 @@ end
 
  vcf_file = joinpath(dirname(pathof(VCFTools)), "..", "test/test.08Jun17.d8b.vcf.gz")
 
-@testset "nrecords and nsamples" begin
-    vcf_data = VCFData(vcf_file)
-    print(n_samples(vcf_data))
-    print(n_records(vcf_data))
-end
+# @testset "nrecords and nsamples" begin
+#     vcf_data = VCFData(vcf_file)
+#     println(GeneticVariantBase.n_samples(vcf_data))
+#     println(GeneticVariantBase.n_variants(vcf_data))
+# end
+
 #  vcf_iter = VCFIterator(vcf_file)
 #  vcf, state = iterate(vcf_iter,1299)
 #  print(vcf)
@@ -85,35 +86,29 @@ end
  # at record 429 qual is missing 
  # at record 1299 id is missing
 
-#  @testset "VCF file tests" begin
-#     # Initialize a counter to keep track of passed tests
-    
-#     # Create an iterator for your VCF file
-#     vcf_iter = VCFIterator(vcf_file)
+ @testset "VCF file tests" begin
+    vcf_iter = VCFIterator(vcf_file)
 
-#     vcf, state = iterate(vcf_iter,1356)
-#     print(vcf)
-    
-    # # Iterate over the length of the VCF file
-    # for i in 1:nrecords(vcf_file)
-    #     # Obtain the VCFRow object at the current iteration
-    #     vcf_row, _ = iterate(vcf_iter, i)
-            
-    #     # Test chrom function
-    #     @test chrom(VCFData(vcf_file), vcf_row) == vcf_row.CHROM
-    #     # Test pos function
-    #     @test pos(VCFData(vcf_file), vcf_row) == vcf_row.POS
-    #     # Test rsid function
-    #     @test rsid(VCFData(vcf_file), vcf_row) == vcf_row.ID
-    #     # Test alleles function
-    #     @test alleles(VCFData(vcf_file), vcf_row) == (vcf_row.REF, vcf_row.ALT)
-    #     # Test alt_allele function
-    #     @test alt_allele(VCFData(vcf_file), vcf_row) == vcf_row.ALT
-    #     # Test ref_allele function
-    #     @test ref_allele(VCFData(vcf_file), vcf_row) == vcf_row.REF
-    # end
+    state = nothing
 
-# end
+    while true
+        result = iterate(vcf_iter, state)
+        if result === nothing
+            break
+        end
+
+        vcf_row, state = result
+
+        # Test chrom function
+        @test chrom(VCFData(vcf_file), vcf_row) == vcf_row.CHROM
+        @test pos(VCFData(vcf_file), vcf_row) == vcf_row.POS
+        @test rsid(VCFData(vcf_file), vcf_row) == vcf_row.ID
+        @test alleles(VCFData(vcf_file), vcf_row) == (vcf_row.REF, vcf_row.ALT)
+        @test alt_allele(VCFData(vcf_file), vcf_row) == vcf_row.ALT
+        @test ref_allele(VCFData(vcf_file), vcf_row) == vcf_row.REF
+    end
+end
+
 
 # @testset "MAF Tests" begin
 #     vcf_iter = VCFIterator(vcf_file)

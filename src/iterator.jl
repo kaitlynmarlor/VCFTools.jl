@@ -26,7 +26,6 @@ mutable struct VCFRow <: GeneticVariantBase.Variant
     QUAL::Float64
     GENOTYPE::Vector{Union{Float64, Missing}}
     DOSAGES::Union{Nothing, Vector{Union{Missing, Float64}}}
-    INDEX::Int64
 end
 
 # for dosages there is a key DS 
@@ -39,61 +38,47 @@ end
     VCFRow
 end
 
-function Base.iterate(itr::VCFIterator, state=1)
-    rows = nrecords(itr.vcffile)
+function Base.iterate(itr::VCFIterator, state=nothing)
+    result = isnothing(state) ? iterate(itr.vcf) : iterate(itr.vcf, state) 
 
-    if state <= 0 || state > rows
-        return nothing
-    else
-        reader = VCF.Reader(openvcf(itr.vcffile, "r")) 
-        count = 0
-
-        for record in reader
-            count += 1
-            if count == state
-                chr = ""
-                pos = 0
-                ids = Vector{String}()
-                ref = ""
-                alt = Vector{String}()
-                qual = 0.0
-            
-                chr = VCF.chrom(record)
-                pos = VCF.pos(record) 
-                ref = VCF.ref(record)
-                alt = VCF.alt(record)
-                geno = gt_key(record, impute=true)
-                ds = ds_key(record, impute=true)
-
-                try
-                    ids = VCF.id(record)
-                catch e
-                    println("Missing ID at record $count")
-                    ids = Vector{String}()
-                end
-                
-                try
-                    qual = VCF.qual(record)
-                catch e
-                    println("Missing QUAL at record $count")
-                    qual = 0.0
-                end
-
-                index = count 
-                vcf_row = VCFRow(chr, pos, ids, ref, alt, qual, geno, ds, index)
-
-                close(reader)
-                return(vcf_row, state+1)
-            end
-        end
-        close(reader)
+    if result === nothing
         return nothing 
+    end 
+
+    rec, next_state = result 
+
+    chr = VCF.chrom(rec)
+    pos = VCF.pos(rec) 
+    ref = VCF.ref(rec)
+    alt = VCF.alt(rec)
+    geno = gt_key(rec, impute=true)
+    ds = ds_key(rec, impute=true)
+    ids = nothing 
+    qual = nothing 
+
+    try
+        ids = VCF.id(rec)
+    catch e
+        println("Missing ID at record")
+        ids = Vector{String}()
     end
+    
+    try
+        qual = VCF.qual(rec)
+    catch e
+        println("Missing QUAL at record")
+        qual = 0.0
+    end
+
+    vcf_row = VCFRow(chr, pos, ids, ref, alt, qual, geno, ds)
+
+    return(vcf_row, next_state)
+            
 end
         
-            # out = zeros(Union{Missing, Float64}, nsamples(itr.vcffile))
-            # geno = copy_gt!(out, reader)
-            # return a tuple not an array 
+    # out = zeros(Union{Missing, Float64}, nsamples(itr.vcffile))
+    # geno = copy_gt!(out, reader)
+    # return a tuple not an array 
 
 
 @inline function Base.length(itr::VCFIterator)
@@ -230,13 +215,13 @@ function GeneticVariantBase.hwepval(data::VCFData, row::VCFRow)
 
 end
 
-function GeneticVariantBase.n_samples(data::VCFData)
-    return nsamples(data.file_name)
-end 
+# function GeneticVariantBase.n_samples(data::VCFData)
+#     return nsamples(data.file_name)
+# end 
 
-function GeneticVariantBase.n_variants(data::VCFData)
-    return nrecords(data.file_name)
-end 
+# function GeneticVariantBase.n_variants(data::VCFData)
+#     return nrecords(data.file_name)
+# end 
 
 
 #copy_gt has keyword argument impute in VCFTools.jl 
@@ -247,7 +232,7 @@ end
 # center will subtract mean
 # can do similar thing for other file formats 
 
-function GeneticVariantBase.alt_dosages!(arr::AbstractArray{T}, row::VCFRow; use_genotype::Bool = false) where T <: Real
+function GeneticVariantBase.alt_dosages!(arr::AbstractArray{T}, row::VCFRow; use_genotype::Bool = false, mean_impute=nothing) where T <: Real
 
 
     if use_genotype
@@ -277,7 +262,7 @@ end
 
 
 
-function GeneticVariantBase.alt_genotypes!(arr::AbstractArray{T}, row::VCFRow) where T <: Real
+function GeneticVariantBase.alt_genotypes!(arr::AbstractArray{T}, row::VCFRow; mean_impute=nothing) where T <: Real
     genotypes = row.GENOTYPE
     @assert length(arr) == length(genotypes) "Array size does not match genotype size"
     for i in 1:length(genotypes)
