@@ -215,13 +215,13 @@ function GeneticVariantBase.hwepval(data::VCFData, row::VCFRow)
 
 end
 
-# function GeneticVariantBase.n_samples(data::VCFData)
-#     return nsamples(data.file_name)
-# end 
+function GeneticVariantBase.n_samples(data::VCFData)
+    return nsamples(data.file_name)
+end 
 
-# function GeneticVariantBase.n_variants(data::VCFData)
-#     return nrecords(data.file_name)
-# end 
+function GeneticVariantBase.n_variants(data::VCFData)
+    return nrecords(data.file_name)
+end 
 
 
 #copy_gt has keyword argument impute in VCFTools.jl 
